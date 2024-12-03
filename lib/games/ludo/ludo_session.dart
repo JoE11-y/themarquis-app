@@ -9,6 +9,7 @@ import 'package:marquis_v2/providers/app_state.dart';
 import 'package:marquis_v2/providers/user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:http/http.dart' as http;
+// import 'package:starknet/starknet.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part "ludo_session.g.dart";
@@ -359,6 +360,8 @@ class LudoSession extends _$LudoSession {
       },
     );
     if (response.statusCode != 201) {
+      print("error");
+      print(utf8.decode(response.bodyBytes));
       throw HttpException(
           'Request error with status code ${response.statusCode}.\nResponse:${utf8.decode(response.bodyBytes)}');
     }
@@ -367,6 +370,53 @@ class LudoSession extends _$LudoSession {
     _id = decodedResponse['id'];
     await getLudoSession();
     await ref.read(userProvider.notifier).getUser();
+    print("_id: " + _id!);
+
+    //// handling create session using starknet.dart
+    // final sepoliaURI = Uri.parse(
+    //     'https://starknet-sepolia.infura.io/v3/2E9u9FUJucyGntaYzan2LNJdEGK');
+    // final provider = JsonRpcProvider(nodeUri: sepoliaURI);
+    // final token = Felt.fromHexString(tokenAddress);
+    // const ludoContractAddress =
+    //     "0x04c744a406ae87f8c9bfec99f3eca1253634c4fa95c770ea2c9139a98be64223";
+    // final ludoContractAddressFelt = Felt.fromHexString(ludoContractAddress);
+    // final amountFelt = Felt.fromString(amount);
+    //
+    // try {
+    //   // random account's public and private keys
+    //   final accountAddress = Felt.fromHexString(
+    //       accountPublicAddress);
+    //   final privateKey = Felt.fromHexString(
+    //       accountPrivateAddress);
+    //   final signer = Signer(privateKey: privateKey);
+    //   final account = Account(
+    //       provider: provider,
+    //       signer: signer,
+    //       accountAddress: accountAddress,
+    //       chainId: StarknetChainId.testNet);
+    //
+    //   (await account.execute(functionCalls: [
+    //     FunctionCall(
+    //       contractAddress: ludoContractAddressFelt,
+    //       entryPointSelector: getSelectorByName('create_session'),
+    //       calldata: [token, amountFelt],
+    //     )
+    //   ]))
+    //       .when(
+    //     error: (error) {
+    //       throw Exception("Error creating a session: $error");
+    //     },
+    //     result: (result) async {
+    //       //handle InvokeTransactionResponseResult
+    //       _id = Uint256.fromFeltList(result).toBigInt().toString();
+    //       await getLudoSession();
+    //       await ref.read(userProvider.notifier).getUser();
+    //     },
+    //   );
+    //   print("_id ${_id!}");
+    // } catch (e) {
+    //   throw Exception("Failed to create a session: $e");
+    // }
   }
 
   Future<void> joinSession(String sessionId, String color) async {
@@ -391,6 +441,51 @@ class LudoSession extends _$LudoSession {
     _id = sessionId;
     await getLudoSession();
     await ref.read(userProvider.notifier).getUser();
+
+    //// handling join session using starknet.dart
+    // final sepoliaURI = Uri.parse(
+    //     'https://starknet-sepolia.infura.io/v3/2E9u9FUJucyGntaYzan2LNJdEGK');
+    // final provider = JsonRpcProvider(nodeUri: sepoliaURI);
+    // const ludoContractAddress =
+    //     "0x04c744a406ae87f8c9bfec99f3eca1253634c4fa95c770ea2c9139a98be64223";
+    // final ludoContractAddressFelt = Felt.fromHexString(ludoContractAddress);
+    // final sessionIdFelt = Felt.fromString(sessionId);
+    //
+    // try {
+    //   // random account's public and private keys
+    //   final accountAddress = Felt.fromHexString(
+    //       accountPublicAddress);
+    //   final privateKey = Felt.fromHexString(
+    //       accountPrivateAddress);
+    //   final signer = Signer(privateKey: privateKey);
+    //   final account = Account(
+    //       provider: provider,
+    //       signer: signer,
+    //       accountAddress: accountAddress,
+    //       chainId: StarknetChainId.testNet);
+    //
+    //   (await account.execute(functionCalls: [
+    //     FunctionCall(
+    //       contractAddress: ludoContractAddressFelt,
+    //       entryPointSelector: getSelectorByName('join_session'),
+    //       calldata: [sessionIdFelt],
+    //     )
+    //   ]))
+    //       .when(
+    //     error: (error) {
+    //       throw Exception("Error joining a session: $error");
+    //     },
+    //     result: (result) async {
+    //       //handle InvokeTransactionResponseResult
+    //       _id = Uint256.fromFeltList(result).toBigInt().toString();
+    //       await getLudoSession();
+    //       await ref.read(userProvider.notifier).getUser();
+    //     },
+    //   );
+    //   print("_id ${_id!}");
+    // } catch (e) {
+    //   throw Exception("Failed to join a session: $e");
+    // }
   }
 
   Future<void> closeSession(String tokenId) async {
